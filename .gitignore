@@ -2,3 +2,4 @@ node_modules/
 .next/
 prisma/chromemilk.db
 .env
+.DS_Store
