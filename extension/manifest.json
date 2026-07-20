@@ -3,7 +3,7 @@
   "name": "ChromeMilk",
   "version": "1.0.0",
   "description": "Turn any webpage into structured, searchable knowledge in one click.",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "scripting"],
   "host_permissions": ["http://localhost:3456/*"],
   "action": {
     "default_popup": "popup.html",
