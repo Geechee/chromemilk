@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  url         String
+  title       String
+  text        String
+  excerpt     String?
+  domain      String?
+  wordCount   Int?
+  extractedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([domain])
+  @@index([extractedAt])
+}
