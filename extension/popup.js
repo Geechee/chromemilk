@@ -47,7 +47,7 @@ async function extract() {
         url: tab.url,
         title: data.title,
         text: data.text,
-        excerpt: (data.text || '').substring(0, 200),
+        excerpt: (data.text || '').substring(0, 500),
         domain: data.domain,
         wordCount: data.wordCount,
         extractedAt: new Date().toISOString(),
@@ -69,42 +69,26 @@ async function extract() {
 }
 
 function extractPageContent() {
-  // Simple content extraction using Readability-like heuristics
   const doc = document;
   const title = doc.title || '';
   const url = doc.location.href;
   const domain = doc.location.hostname;
   
-  // Try to find main content
-  let article = doc.querySelector('article') || 
-                doc.querySelector('[role="main"]') ||
-                doc.querySelector('main') ||
-                doc.querySelector('.post-content') ||
-                doc.querySelector('.article-content') ||
-                doc.querySelector('#content') ||
-                doc.body;
-  
-  // Clone and remove non-content elements
-  const clone = article.cloneNode(true);
-  const removals = clone.querySelectorAll(
-    'script, style, nav, header, footer, iframe, .ad, .advertisement, .sidebar, .nav, .menu, .comments, [role="navigation"], [role="banner"], [role="contentinfo"]'
-  );
+  // Clone the entire body
+  const clone = doc.body.cloneNode(true);
+  // Only remove truly non-content elements
+  const removals = clone.querySelectorAll('script, style, noscript, iframe, svg, [aria-hidden="true"]');
   removals.forEach(el => el.remove());
   
   const text = (clone.textContent || '')
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s*\n/g, '\n')
+    .replace(/[\t ]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n /g, '\n')
     .trim();
   
-  const wordCount = text.split(/\s+/).length;
+  const wordCount = text.split(/\s+/).filter(w => w.length > 1).length;
   
-  // Extract headings
-  const headings = [];
-  clone.querySelectorAll('h1, h2, h3').forEach(h => {
-    headings.push({ level: h.tagName, text: h.textContent.trim().substring(0, 200) });
-  });
-  
-  return { title, url, domain, text, wordCount, headings };
+  return { title, url, domain, text, wordCount, headings: [] };
 }
 
 // Search button opens dashboard
